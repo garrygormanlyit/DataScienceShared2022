@@ -154,8 +154,96 @@ brexit_data[which.min(brexit_data$Proportion), display_variables]
 # creates a table of the proportions of voters from each region
 prop.table(table(brexit_data$RegionName))
 
-# plot the proportions of voters fromeach region
+# plot the proportions of voters from each region
 barplot(height = prop.table(table(brexit_data$RegionName)), main = "Vote proportion", 
         ylab = "Frequency",
         xlab = "Region",
-        col = "white")
+        col = "blue")
+
+# create a plot to show differences in qualifications
+# show charts side by side
+# use mfrow
+
+# use this as an example
+hist(brexit_data$MeanAge, 
+     main = "Histogram for mean adult age (years)", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "MeanAge")
+
+opar <- par(no.readonly = TRUE) # records current settings for plots
+par(mfrow = c(1,2)) # plot side by side
+
+hist(brexit_data$NoQuals, 
+     main = "Histogram for no qualifications", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "% of residents with no qualifications") # 15-20% have no qualifications
+
+
+hist(brexit_data$L4Quals_plus , 
+     main = "Histogram for level 4+ qualifications", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "% of residents with level 4+ qualifications")
+
+# reset opar
+par(opar)
+
+plot(x = brexit_data$NoQuals, 
+     y = brexit_data$AdultMeanAge, 
+     xlab = "% of people in each ward with No quals", 
+     ylab = "Adult mean age")
+
+plot(x = brexit_data$L4Quals_plus, 
+     y = brexit_data$AdultMeanAge, 
+     xlab = "% of people in each ward with L4+ quals", 
+     ylab = "Adult mean age")
+
+# examine the data in more detail
+# do this in CAs as a starting point 
+# this identifies correlations between variables
+# once correlations are identified, do another plot on that
+# high level view of all the data. 
+# bottom left - proportion on y axis, adultmeanage on x
+# top right - adultmeanage on y axis, proportion on x
+variables_of_interest <- c("AdultMeanAge", 
+                           "Owned", 
+                           "NoQuals", 
+                           "L4Quals_plus", 
+                           "Unemp",
+                           "HigherOccup",
+                           "Deprived",
+                           "Proportion")
+# 
+pairs(brexit_data[variables_of_interest])
+
+# shows pos and neg correlations data in the data
+# when building a neural network you need correlations first 
+# to identify related variables
+install.packages("corrplot")
+library(corrplot)
+corrplot(corr = cor(numerical_data),
+         t1.col = "Black",
+         method = "number",
+         t1.cex = 0.5)
+
+# education and ethnicity influence how people voted
+# young educated people voted to stay
+
+# next step is to split data up - dump irrelivent data
+# just keep meaningful data
+
+# age 44 and below
+brexit_data$under45 <- (Age_18to19+
+                        Age_20to24+
+                        Age_25to29+
+                        Age_30to44)
+# age 45 and above
+brexit_data$over45 <- (Age_45to59 +
+                         Age_60to64 +
+                         Age_65to74 +
+                         Age_75to84 +
+                         Age_85to89 +
+                         Age_90plus )
+head(brexit_data)
